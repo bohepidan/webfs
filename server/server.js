@@ -20,6 +20,14 @@ mongoose
     .then(() => console.log("Database connected"))
     .catch((err) => console.error("Database connection error:", err));
 
+const { router: authRoutes, authMiddleware } = require("./routes/authRoutes");
+
+// 添加用户认证路由
+app.use("/api/auth", authRoutes);
+
+// 保护资源监控路由
+app.use("/api/nodes", authMiddleware, nodeRoutes);  //TODO:nodeRoute是？
+
 // API 路由
 app.post("/api/nodes/add", async (req, res) => {
     try {

@@ -72,4 +72,3 @@ collector
 ├── resourceCollecotr.js        #资源采集源文件
 ├── node_id.json                #本地持久化存储 NODE_ID
 
-![alt text](image.png)

@@ -11,9 +11,11 @@
   "license": "ISC",
   "proxy": "http://localhost:8000",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.1",
     "systeminformation": "^5.25.11"
   }
