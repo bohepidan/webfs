@@ -2,6 +2,8 @@
 
 轻量级文件系统的的基础管理
 
+AI记录:<https://github.com/copilot/share/0a5f5130-43e0-8057-a003-a447a0dd4090>
+
 ## 运行
 
 web前端：cd client & npm start
@@ -18,7 +20,7 @@ web后端：cd server & node ./server.js
 
 ### 用户管理
 
-- TODO:用户登录界面，支持用户依靠账户密码登录
+- 用户登录界面，支持用户依靠账户密码登录
 - TODO:暂时用户只有管理员一种
 
 ### 日志管理

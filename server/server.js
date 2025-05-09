@@ -21,65 +21,15 @@ mongoose
     .catch((err) => console.error("Database connection error:", err));
 
 const { router: authRoutes, authMiddleware } = require("./routes/authRoutes");
+const nodeRoutes = require("./routes/nodeRoutes");
 
 // 添加用户认证路由
 app.use("/api/auth", authRoutes);
 
 // 保护资源监控路由
-app.use("/api/nodes", authMiddleware, nodeRoutes);  //TODO:nodeRoute是？
-
-// API 路由
-app.post("/api/nodes/add", async (req, res) => {
-    try {
-        const { name, ip } = req.body;
-        const newNode = new Node({ name, ip, status: {}, history: [] });
-        console.log('test1:', name, ip);
-        await newNode.save();
-        console.log('test2:', newNode._id);
-        res.status(201).json({ message: "Node added successfully", node: newNode });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.delete("/api/nodes/delete/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        await Node.findByIdAndDelete(id);
-        res.status(200).json({ message: "Node deleted successfully" });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get("/api/nodes/status", async (req, res) => {
-    try {
-        const nodes = await Node.find();
-        res.status(200).json(nodes);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.put("/api/nodes/status/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { status } = req.body;
-        console.log('In /api/nodes/status/:id,', 'ID:', id, 'STATUS:', status);
-        const node = await Node.findById(id);
-        if (!node) return res.status(404).json({ error: "Node not found" });
-
-        // 更新状态和历史数据
-        node.status = status;
-        node.history.push({ ...status, time: new Date() });
-        node.lastUpdated = new Date();
-        await node.save();
-
-        res.status(200).json({ message: "Node updated successfully", node });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
+// app.use("/api/nodes", authMiddleware, nodeRoutes);
+//TODO:暂时让所有节点操作都跳过身份验证，但当添加节点操作的权限限制时需要更改，但总之put操作，也就是节点上传数据是跳过验证的。
+app.use("/api/nodes", nodeRoutes);
 
 // 启动服务
 app.listen(PORT, () => {
