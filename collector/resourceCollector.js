@@ -1,14 +1,75 @@
 const axios = require("axios");
 const si = require("systeminformation");
 const fs = require("fs");
+const path = require("path");
+const express = require("express");
+
+const app = express();
 
 // 替换为你的后端服务器地址
 const BACKEND_URL = "http://localhost:8000/api/nodes";
+
+const PORT = 4321; // 每个节点的资源收集模块监听独立端口
+
+// 节点本地存储路径
+const STORAGE_DIR = path.join(__dirname, "storage");
+if (!fs.existsSync(STORAGE_DIR)) {
+    fs.mkdirSync(STORAGE_DIR);
+}
+
+// 模拟分布式文件系统的节点信息
+// const NODES = [
+//     { ip: "127.0.0.1", port: 4321 },
+// ];
 
 // 本地持久化存储 NODE_ID 的文件名
 const NODE_ID_FILE = "node_id.json";
 
 let NODE_ID = null;
+
+
+// 文件上传
+app.post("/files/upload", express.raw({ type: "application/octet-stream" }), async (req, res) => {
+    const { filename } = req.query;
+    if (!filename) return res.status(400).send("Filename is required");
+
+    const filePath = path.join(STORAGE_DIR, filename);
+    fs.writeFileSync(filePath, req.body);
+    console.log(`File ${filename} saved locally.`);
+
+    // TODO: 分片并分发到其他节点
+    res.status(200).send("File uploaded successfully.");
+});
+
+// 文件删除
+app.delete("/files/:filename", (req, res) => {
+    const { filename } = req.params;
+    const filePath = path.join(STORAGE_DIR, filename);
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send("File not found.");
+    }
+
+    fs.unlinkSync(filePath);
+    console.log(`File ${filename} deleted locally.`);
+
+    // TODO: 通知其他节点删除文件
+    res.status(200).send("File deleted successfully.");
+});
+
+// 获取文件列表
+app.get("/files", (req, res) => {
+    console.log('获取文件列表...')
+    const files = fs.readdirSync(STORAGE_DIR);
+    console.log(files);
+    console.log('获取成功...')
+    res.status(200).json(files);
+});
+
+// 启动模拟文件系统
+app.listen(PORT, () => {
+    console.log(`Node resource collector running on port ${PORT}`);
+});
 
 // 从本地文件加载 NODE_ID
 const loadNodeId = () => {
